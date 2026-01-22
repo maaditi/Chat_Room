@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <div class="main flex h-screen">
+        <div class="chats w-1/4 bg-white border-r border-gray-200">
+          <% onlineUser.forEach( ele =>{ %>  
+            <div class=" cursor-pointer user flex items-center p-4 border-b border-gray-200" onclick="selectChat('<%= ele._id %>')">
+                <img src="<%= ele.image%> alt="Profile" class="w-10 h-10 rounded-full">
+                <h1 class="ml-3 font-medium text-gray-800"><%= ele.displayName %></h1>
+            </div>
+            <% } ) %>
+        </div>
+        <div class="chat-box flex-1 flex flex-col">
+            <div class="chat-box-header p-4 bg-white border-b border-gray-200">   
+                <h1 class="font-medium text-gray-800">Chat Room</h1>
+            </div>
+            <div class="chat-box-body flex-1 p-4 overflow-y-auto">
+                <textarea 
+                    class="w-full h-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                    placeholder="Chat history will appear here..."
+                    readonly
+                ></textarea>
+            </div>
+            <div class="sendmessage p-4 bg-white border-t border-gray-200">
+                <div class="flex gap-2">
+                    <input 
+                        type="text" 
+                        placeholder="Type your message..." 
+                        class="flex-1 p-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                    <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                    onclick="sendMessage()" >
+                        Send
+                    </button>
+                </div>
+            </div>
+        </div>  
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  console.log('<%=user._id%>')
+  socket.emit('join', '<%=user._id%>');
+  
+  var reciever = '';
+
+
+  function selectChat(id){
+    reciever = id;
+    console.log(id);
+    
+  }
+
+  function sendMessage(  ){
+    const message = document.querySelector('input').value;
+
+    socket.emit('message',{
+        message ,
+        id :  reciever
+    })
+  }
+
+  socket.on('msg' , (obj) =>{
+    console.log(obj)
+  })
+
+
+
+</script>
+</body>
+</html>
